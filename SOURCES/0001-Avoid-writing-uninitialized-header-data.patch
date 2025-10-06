@@ -1,0 +1,46 @@
+From de286d090353e92b479c49590aa9c9e99b3defa1 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Wed, 28 Aug 2024 09:47:39 +0200
+Subject: [PATCH] Avoid writing uninitialized header data
+
+---
+ database-builder.cpp | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/database-builder.cpp b/database-builder.cpp
+index f9dfb71..0655681 100644
+--- a/database-builder.cpp
++++ b/database-builder.cpp
+@@ -531,7 +531,15 @@ DatabaseBuilder::DatabaseBuilder(const char *outfile, gid_t owner, int block_siz
+ 	hdr.max_version = 2;
+ 	hdr.filename_index_offset_bytes = -1;
+ 	hdr.zstd_dictionary_length_bytes = -1;
++	hdr.zstd_dictionary_offset_bytes = -1; // Dictionary offset is not known yet.
+ 	hdr.check_visibility = check_visibility;
++	hdr.directory_data_length_bytes = 0;
++	hdr.directory_data_offset_bytes = 0;
++	hdr.next_zstd_dictionary_length_bytes = 0;
++	hdr.next_zstd_dictionary_offset_bytes = 0;
++	hdr.conf_block_length_bytes = 0;
++	hdr.conf_block_offset_bytes = 0;
++
+ 	fwrite(&hdr, sizeof(hdr), 1, outfp);
+ 
+ 	if (dictionary.empty()) {
+@@ -543,13 +551,6 @@ DatabaseBuilder::DatabaseBuilder(const char *outfile, gid_t owner, int block_siz
+ 		hdr.zstd_dictionary_length_bytes = dictionary.size();
+ 		cdict = ZSTD_createCDict(dictionary.data(), dictionary.size(), /*level=*/6);
+ 	}
+-
+-	hdr.directory_data_length_bytes = 0;
+-	hdr.directory_data_offset_bytes = 0;
+-	hdr.next_zstd_dictionary_length_bytes = 0;
+-	hdr.next_zstd_dictionary_offset_bytes = 0;
+-	hdr.conf_block_length_bytes = 0;
+-	hdr.conf_block_offset_bytes = 0;
+ }
+ 
+ DatabaseReceiver *DatabaseBuilder::start_corpus(bool store_dir_times)
+-- 
+2.45.2
+

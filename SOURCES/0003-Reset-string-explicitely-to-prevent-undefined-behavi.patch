@@ -1,0 +1,24 @@
+From 889638fceaca2b668ea3056c47947b96413b2670 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Wed, 28 Aug 2024 16:01:26 +0200
+Subject: [PATCH] Reset string explicitely to prevent undefined behavior
+
+---
+ plocate.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plocate.cpp b/plocate.cpp
+index 234b703..36f087e 100644
+--- a/plocate.cpp
++++ b/plocate.cpp
+@@ -799,6 +799,7 @@ void parse_dbpaths(const char *ptr, vector<string> *output)
+ 		if (*ptr == ':') {
+ 			// Separator.
+ 			output->push_back(move(str));
++			str.clear();
+ 			++ptr;
+ 			continue;
+ 		}
+-- 
+2.45.2
+
