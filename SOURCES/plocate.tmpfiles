@@ -1,0 +1,2 @@
+d /var/lib/plocate 0755 root root -
+f /var/lib/plocate/CACHEDIR.TAG 0644 root root - Signature: 8a477f597d28d172789f06886806bc55\n# This file is a cache directory tag created by plocate.\n# For information about cache directory tags, see:\n#\thttps://bford.info/cachedir/\n
